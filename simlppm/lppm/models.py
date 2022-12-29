@@ -26,11 +26,19 @@ class UserProfile(models.Model):
     )
     REVIEWER = models.CharField(max_length=5, choices=REVIEWER_CHOICES)
 
+    @property
+    def first_name(self):
+        return self.user.first_name
+    
+    @property
+    def last_name(self):
+        return self.user.last_name
+
     def __str__(self):
         return self.NIDN_NPM
 
     class Meta:
-        verbose_name_plural = "Profil Pengguna"
+        verbose_name_plural = "00. Profil Pengguna"
 
 class BerkasPengguna(models.Model):
     ID = models.AutoField(primary_key=True)
@@ -47,26 +55,19 @@ class BerkasPengguna(models.Model):
         ('(Umum) Lainnya', '(Umum) Lainnya'),
     )    
     JENIS_BERKAS = models.CharField(max_length=100, choices=JENIS_BERKAS_CHOICES)
-    LINK_BERKAS = models.CharField(max_length=300)
-
-    SUMBER_PENDANAAN_CHOICES = (
-        ('Internal', 'Internal'),
-        ('External', 'External'),
-        ('Hibah', 'Hibah'),
-    )  
-    SUMBER_PENDANAAN = models.CharField(max_length=25, choices=SUMBER_PENDANAAN_CHOICES)
-
+    LINK_BERKAS = models.URLField()
+    
     def __str__(self):
         return self.NAMA_BERKAS
     
     class Meta:
-        verbose_name_plural = "Berkas Pengguna"
+        verbose_name_plural = "01. Berkas Pengguna"
 
 class PengajuanJadwal(models.Model):
     ID = models.AutoField(primary_key=True)
     NIDN_NPM = models.ManyToManyField(UserProfile, related_name='pengajuan_jadwal')
     NAMA_PRESENTER = models.CharField(max_length=80)
-    LINK_BERKAS = models.ManyToManyField(BerkasPengguna, related_name='pengajuan_jadwal')
+    #LINK_BERKAS = models.ManyToManyField(BerkasPengguna, related_name='pengajuan_jadwal')
     TGL_PENGAJUAN = models.DateField()
 
     JENIS_PENGAJUAN_CHOICES = (
@@ -83,13 +84,21 @@ class PengajuanJadwal(models.Model):
     LINK_BERKAS = models.ForeignKey(BerkasPengguna, on_delete=models.CASCADE, related_name='pengajuan_jadwal')
     
     JUDUL_BERKAS = models.TextField(max_length=1000)
-    
+    SUMBER_PENDANAAN_CHOICES = (
+        ('Internal', 'Internal'),
+        ('External', 'External'),
+        ('Hibah', 'Hibah'),
+        ('Lainnya','Lainnya')
+    )  
+    SUMBER_PENDANAAN = models.CharField(max_length=25, choices=SUMBER_PENDANAAN_CHOICES)
+    KETERANGAN_PENDANAAN = models.TextField(max_length=150, blank=True)
+    NOMINAL_PEMBIAYAAN = models.DecimalField(max_digits=13, decimal_places=0)
 
     def __str__(self):
         return self.JUDUL_BERKAS
 
     class Meta:
-        verbose_name_plural = "Pengajuan Jadwal"
+        verbose_name_plural = "02. Pengajuan Jadwal"
 
 
 class PengajuanJadwalReview(models.Model):
@@ -104,7 +113,7 @@ class PengajuanJadwalReview(models.Model):
         ('Selesai', 'Selesai'),
     )    
 
-    #JENIS_PENGAJUAN = models.CharField(max_length=100, choices=JENIS_PENGAJUAN_CHOICES)
+   
     STATUS_PENGAJUAN = models.CharField(max_length=11,choices=STATUS_PENGAJUAN_CHOICES)
     
     REVIEWER1 = models.ManyToManyField(UserProfile, related_name='reviewer1', limit_choices_to={'KATEGORI': 'Dosen','REVIEWER':'Ya'})
@@ -118,10 +127,12 @@ class PengajuanJadwalReview(models.Model):
     CATATAN_REVIEWER2 = models.TextField(max_length=1000,blank=True)
     CATATAN_REVIEWER3 = models.TextField(max_length=1000,blank=True)
     
-    
+    @property
+    def nama_presenter(self):
+        return self.ID.NAMA_PRESENTER
 
     def __str__(self):
         return self.STATUS_PENGAJUAN
 
     class Meta:
-        verbose_name_plural = "Info Seminar"
+        verbose_name_plural = "03. Info Seminar"
