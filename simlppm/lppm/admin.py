@@ -9,7 +9,7 @@ admin.site.site_header = 'LPPM UNDA'
 
 @admin.register(BerkasPengguna)
 class BerkasPenggunaAdmin(ImportExportModelAdmin):
-    list_display = ('ID', 'NIDN_NPM', 'NAMA_BERKAS', 'JENIS_BERKAS', 'LINK_BERKAS', 'SUMBER_PENDANAAN')
+    list_display = ('ID', 'NIDN_NPM', 'NAMA_BERKAS', 'JENIS_BERKAS', 'format_link_berkas', 'SUMBER_PENDANAAN')
     list_filter = ('JENIS_BERKAS', 'SUMBER_PENDANAAN')
     search_fields = ('NAMA_BERKAS', 'NIDN_NPM')
     raw_id_fields = ['NIDN_NPM']
@@ -24,6 +24,16 @@ class BerkasPenggunaAdmin(ImportExportModelAdmin):
         if request.user.is_superuser:
             return qs
         return qs.filter(NIDN_NPM=request.user.userprofile.ID)
+    
+    def format_link_berkas(self, obj):
+        return format_html(
+            '<a href="{}" target="_blank">{}</a>',
+            obj.LINK_BERKAS,
+            obj.LINK_BERKAS
+        )
+    format_link_berkas.allow_tags = True
+
+    
 
 
 @admin.register(PengajuanJadwal)
@@ -84,12 +94,14 @@ class CustomModelAdmin(ImportExportModelAdmin):
         # Kembalikan form dengan akses field yang telah diatur
         return super(CustomModelAdmin, self).get_form(request, obj, **kwargs)
 
-class UserProfileInline(admin.TabularInline):
-    model = UserProfile
-    extra = 0
+#class UserProfileInline(admin.StackedInline):
+#    model = UserProfile
+#    extra = 0
 
-class UserAdmin(admin.ModelAdmin):
-    inlines = [UserProfileInline]
+#class UserAdmin(admin.ModelAdmin):
+#    inlines = [UserProfileInline]
+#    fields = ['username', 'password', 'password_confirmation']
+#    change_password_form = AdminPasswordChangeForm
 
 #admin.site.unregister(User)
 #admin.site.register(User, UserAdmin)
