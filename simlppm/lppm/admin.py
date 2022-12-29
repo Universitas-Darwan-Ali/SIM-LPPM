@@ -5,11 +5,13 @@ from .models import BerkasPengguna, PengajuanJadwal, UserProfile, PengajuanJadwa
 from import_export.admin import ImportExportModelAdmin
 from django.utils.html import format_html
 
+
 admin.site.site_header = 'LPPM UNDA'
+
 
 @admin.register(BerkasPengguna)
 class BerkasPenggunaAdmin(ImportExportModelAdmin):
-    list_display = ('ID', 'NIDN_NPM', 'NAMA_BERKAS', 'JENIS_BERKAS', 'format_link_berkas', 'SUMBER_PENDANAAN')
+    list_display = ('ID', 'NIDN_NPM', 'NAMA_BERKAS', 'JENIS_BERKAS', 'link_berkas', 'SUMBER_PENDANAAN')
     list_filter = ('JENIS_BERKAS', 'SUMBER_PENDANAAN')
     search_fields = ('NAMA_BERKAS', 'NIDN_NPM')
     raw_id_fields = ['NIDN_NPM']
@@ -25,13 +27,13 @@ class BerkasPenggunaAdmin(ImportExportModelAdmin):
             return qs
         return qs.filter(NIDN_NPM=request.user.userprofile.ID)
     
-    def format_link_berkas(self, obj):
+    def link_berkas(self, obj):
         return format_html(
             '<a href="{}" target="_blank">{}</a>',
             obj.LINK_BERKAS,
             obj.LINK_BERKAS
         )
-    format_link_berkas.allow_tags = True
+    link_berkas.allow_tags = True
 
     
 
@@ -68,7 +70,7 @@ class UserProfileAdmin(ImportExportModelAdmin):
 class CustomModelAdmin(ImportExportModelAdmin):
     list_display = ('ID', 'STATUS_PENGAJUAN', 'TGL_SEMINAR', 'KESIMPULAN')
     list_filter = ('STATUS_PENGAJUAN',)
-    search_fields = ('NIDN_NPM__NIDN_NPM',)
+    search_fields = ('TGL_SEMINAR','REVIEWER1', 'REVIEWER2', 'REVIEWER3')
     raw_id_fields = ('ID','REVIEWER1', 'REVIEWER2', 'REVIEWER3', 'PEJABAT_LPPM')
     # Override metode get_form untuk mengatur akses field pada form
     def get_form(self, request, obj=None, **kwargs):
