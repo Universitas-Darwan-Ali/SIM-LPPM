@@ -3,7 +3,7 @@ from .models import BerkasPengguna, PengajuanJadwal, UserProfile, PengajuanJadwa
 
 #from django.contrib.auth.models import User
 from import_export.admin import ImportExportModelAdmin
-
+from django.utils.html import format_html
 
 admin.site.site_header = 'LPPM UNDA'
 
